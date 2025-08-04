@@ -1,42 +1,19 @@
 import streamlit as st
 import msal
- 
-# -----------------------------
-# 🔐 Configuration (replace with your actual values)
-# -----------------------------
-CLIENT_ID = "97daf6d6-e5a7-47ba-8127-567b290c4df5"
-CLIENT_SECRET = "RpO8Q~2fvSvffhwTUNNYdzyzqTsf6h_jmw4CeabO"
-TENANT_ID = "5d41fd7c-b291-4130-ac2b-9170e1c4c03e"
-AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-REDIRECT_URI = "http://localhost:8501"
-SCOPE = ["https://orgb0732c8b.crm8.dynamics.com/.default"]
- 
-# -----------------------------
-# � Fetch and display leads
-# -----------------------------
 import requests
-import pandas as pd
 
-def get_all_leads(token):
-    url = "https://orgb0732c8b.crm8.dynamics.com/api/data/v9.2/leads"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json"
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        data = response.json()
-        leads = data.get('value', []) if 'value' in data else data.get('leads', [])
-        return leads
-    else:
-        st.error(f"Failed to fetch leads: {response.status_code} {response.text}")
-        return []
+CLIENT_ID = st.secrets["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+TENANT_ID = st.secrets["TENANT_ID"]
+AUTHORITY = st.secrets["AUTHORITY"]
+REDIRECT_URI = st.secrets["REDIRECT_URI"]
+SCOPE = st.secrets["SCOPE"]
 
 def login_screen():
     if "token" not in st.session_state:
         st.session_state.token = None
 
-    st.title("Microsoft Login for Dynamics 365")
+    st.title("Microsoft Login Generate Token")
 
     msal_app = msal.ConfidentialClientApplication(
         client_id=CLIENT_ID,
