@@ -24,20 +24,26 @@ def login_screen():
     query_params = st.experimental_get_query_params()
     auth_code = query_params.get("code", [None])[0]
 
-    if auth_code and not st.session_state.token:
-        result = msal_app.acquire_token_by_authorization_code(
-            code=auth_code,
-            scopes=SCOPE,
-            redirect_uri=REDIRECT_URI
-        )
-        token = result.get("access_token")
-        if token:
-            st.session_state.token = token
-            st.success("✅ Login successful!")
+    if auth_code and not st.session_state.get("token"):
+        try:
+            result = msal_app.acquire_token_by_authorization_code(
+                code=auth_code,
+                scopes=SCOPE,
+                redirect_uri=REDIRECT_URI
+            )
+            token = result.get("access_token")
+            if token:
+                st.session_state.token = token
+                st.success("✅ Login successful!")
+                st.experimental_set_query_params()  # Clear ?code= from URL
+                st.rerun()  # Reload app without the code in URL
+            else:
+                error_msg = result.get("error_description", "Unknown error")
+                st.error(f"❌ Login failed: {error_msg}")
+                st.experimental_set_query_params()  # Important to clear reused code!
+        except Exception as e:
+            st.error(f"❌ Exception occurred: {e}")
             st.experimental_set_query_params()
-            st.rerun()
-        else:
-            st.error("❌ Login failed: " + result.get("error_description", "Unknown error"))
 
     elif st.session_state.token:
         st.success("✅ Already logged in")
