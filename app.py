@@ -1,6 +1,6 @@
 import streamlit as st
 import msal
-import requests
+import streamlit.components.v1 as components
 
 CLIENT_ID = st.secrets["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
@@ -56,13 +56,15 @@ def login_screen():
                 scopes=SCOPE,
                 redirect_uri=REDIRECT_URI
             )
-        st.markdown(f"""
-            <a href="{auth_url}" target="_self">
-                <button style="background-color:#0078D4; color:white; padding:10px 20px; border:none; border-radius:5px; font-size:16px;">
-                    Login with Microsoft
-                </button>
-            </a>
-        """, unsafe_allow_html=True)
+        if st.button("Login with Microsoft"):
+            components.html(
+                f"""
+                <script>
+                    window.open("{auth_url}", "_blank");
+                </script>
+                """,
+                height=0,
+            )
 
 if __name__ == "__main__":
     login_screen()
